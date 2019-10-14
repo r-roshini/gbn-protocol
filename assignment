@@ -1,0 +1,178 @@
+
+import java.io.*;
+import java.net.*;
+import java.util.Random;
+public class serverprg {
+	public static void main(String args[])throws Exception
+	{
+		DatagramSocket server=new DatagramSocket(1234);
+		byte[] b=new byte[300];
+		DatagramPacket request=new DatagramPacket(b,b.length);
+		server.receive(request);
+		System.out.println("server establishe");
+		byte[] data=request.getData();
+		String s=new String(data);
+				System.out.println("client is now connected");
+		int x=Integer.parseInt(s);
+		int k=Integer.parseInt(s);
+		int j=0;
+		int i=Integer.parseInt(s);
+		boolean flag=true;
+		Random r=new Random(6);
+		int mod=r.nextInt(6);
+		while(mod==1||mod==0)
+			mod=r.nextInt(6);
+		while(true)
+		{
+			int c=k;
+			for(int h=0;h<=x;h++)
+			{
+				System.out.print("|"+c+"|");
+				c=(c+1)%x;
+			}
+			System.out.println();
+			System.out.println();
+			if(k==j)
+			{
+				System.out.println("frame"+k+"recieved"+"\n"+"Data"+j);
+				j++;
+				System.out.println();
+			}
+			else
+				System.out.println("frames recieved not in correct order"+"\n"+"Expected frame:"+j+"\n"+"recieved frame no:"+k);
+			System.out.println();
+			if(j%mod==0&&flag)
+			{
+				System.out.println("error found.acknowledgement not sent.");
+				flag=!flag;
+				j--;
+			}
+			else if(k==j-1)
+			{
+				server.send(k);
+				System.out.println("acknowledgement sent");
+			}
+			System.out.println();
+			if(j%mod==0)
+				flag=!flag;
+			k=Integer.parseInt(s);
+			if(k==1)
+				break;
+			i=Integer.parseInt(s);
+		}
+		System.out.println("client finished sending data.Exiting");
+		System.exit(0);
+	}
+}
+			
+
+
+import java.net.*;
+import java.util.*;
+import java.io.*;
+public class client {
+	public static void main(String args[])throws Exception
+	{
+		int m=4;/*window size*/
+		DatagramSocket sock=new DatagramSocket();
+		String s=(String)cin.readLine();
+		byte[] b=s.getBytes();
+		BufferedReader br=new BufferedReader(new InputStreamReader(System.in));
+		int x=(int)(Math.pow(2, m))-1;
+		System.out.print("enter the number of frames to be sent:");
+		int count=Integer.parseInt(br.readLine());
+				int data[]=new int[count];
+				int h=0;
+				
+				for(int i=0;i<count;i++)
+				{
+					System.out.print("enetr data for frame no"+h+"->");
+					data[i]=Integer.parseInt(br.readLine());
+							h=(h+1)%x;
+				}
+				Socket client=new Socket("localhost",1234);
+				ObjectInputStream ois=new ObjectInputStream(client.getInputStream());
+				ObjectOutputStream oos=new ObjectStream(client.getOutputStream())
+						System.out.println("connected with server");
+				boolean flag=false;
+				GoBackListener listener=new GoBackNListener(ois,x);
+				listener.t.start();
+				int strt=0;
+				h=0;
+				oos.writeObject(x);
+				do
+					{
+					int c=h;
+					for(int i=h;i<count;i++);
+					{
+						System.out.println("|"+c+"|");
+						c=(c+1)%x;
+					}
+					System.out.println();
+					System.out.println();
+					h=strt;
+					for(int i=strt;i<x;i++)
+					{
+						System.out.println("sending frame:"+H);
+						h=(h+1)%x;
+						System.out.println();
+						oos.writeObject(i);
+						oos.writeObject(data[i]);
+						Thread.sleep(100);;
+					}
+					listener.t.join(2000);
+					if(listener.reply!=x-1)
+					{
+						System.out.println("no reply from in 2 seconds.resending data from frame no"+(listener.reply+1));
+						System.out.println();
+						strt=listener.reply+1;
+						flag=false;
+					}
+					else
+					{
+						System.out.println("all elements sent successfully.exitng");
+						flag=true;
+					}
+					}
+				while(!flag)
+					oos.writeObject(-1);
+	}
+}
+Thread t;
+ObjectInputStream ois;
+int reply,x;
+GoBackNListener(ObjectInputStream o,int i)
+{
+	t=new Thread(this);
+	ois=o;
+	reply=-2;
+	x=i;
+}
+@Overide
+public void run()
+{
+	try
+	{
+		int temp=0;
+		while(reply!=-1)
+		{
+			reply=(Integer)ois.readObject();
+			if(reply!=-1&&reply!=temp+1)
+				reply=temp;
+			if(reply!=-1)
+			{
+				temp=reply;
+				System.out.println("Acknowledgement of frame no"+(reply%x)+"recieved");
+				System.out.println();
+			}
+		}
+		reply=temp;
+	}
+	catch(Exception e)
+	{
+		System.out.println("Exception->"+e);
+	}
+}
+}
+						
+
